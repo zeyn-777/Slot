@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AzePRO SLOT ƏYLƏNCƏ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* --- CSS: Cyberpunk Dizayn --- */
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff00ff;
+            --neon-purple: #9d00ff;
+            --bg-dark: #050a14;
+            --glass-bg: rgba(20, 20, 30, 0.85);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Orbitron', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .game-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            box-shadow: 0 0 50px rgba(157, 0, 255, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            max-width: 380px;
+            width: 90%;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 26px;
+            margin: 0 0 15px 0;
+            text-transform: uppercase;
+            font-weight: 900;
+            letter-spacing: 1px;
+            color: #fff;
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
+        
+        h1 span {
+            color: var(--neon-pink);
+            display: block;
+            font-size: 18px;
+            letter-spacing: 4px;
+            margin-top: 5px;
+            text-shadow: 0 0 15px var(--neon-pink);
+        }
+
+        .stats-panel {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+            font-size: 14px;
+            color: var(--neon-blue);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: bold;
+        }
+
+        .slot-machine {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin: 20px 0;
+            padding: 10px;
+            background: #000;
+            border-radius: 15px;
+            border: 2px solid var(--neon-purple);
+            box-shadow: inset 0 0 20px rgba(157, 0, 255, 0.5);
+            position: relative;
+        }
+
+        .reel {
+            flex: 1;
+            height: 100px;
+            background: #111;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 50px;
+            overflow: hidden;
+            border: 1px solid #333;
+            position: relative;
+        }
+
+        .reel::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 40%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.15), transparent);
+            pointer-events: none;
+        }
+
+        .symbol { transition: transform 0.1s; }
+
+        /* Sürətli fırlanma effekti */
+        .spinning .symbol {
+            filter: blur(4px);
+            animation: shake 0.1s infinite;
+        }
+
+        @keyframes shake {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(5px); }
+            100% { transform: translateY(-5px); }
+        }
+
+        .win-border {
+            animation: glow 0.5s infinite alternate;
+            border-color: var(--neon-pink) !important;
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 0 10px var(--neon-pink); }
+            to { box-shadow: 0 0 40px var(--neon-pink); }
+        }
+
+        #message {
+            min-height: 30px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #fff;
+            font-size: 15px;
+            text-shadow: 0 0 5px black;
+        }
+
+        #spin-btn {
+            width: 100%;
+            padding: 18px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: 900;
+            color: #000;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 0 20px var(--neon-blue);
+            transition: 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #spin-btn:active { transform: scale(0.96); }
+        #spin-btn:disabled { filter: grayscale(1); cursor: not-allowed; opacity: 0.5; }
+
+        /* Səs İkonu */
+        .sound-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 20px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <div class="sound-toggle" id="sound-btn">🔊</div>
+        <h1>AzePRO <span>SLOT ƏYLƏNCƏ</span></h1>
+        
+        <div class="stats-panel">
+            <div>BALANS: <span id="balance">5000</span> 💎</div>
+            <div>MƏRC: <span id="bet">100</span> 💎</div>
+        </div>
+
+        <div id="message">OYNAMAĞA HAZIRSAN?</div>
+
+        <div class="slot-machine" id="machine-box">
+            <div class="reel"><div class="symbol" id="reel1">🍒</div></div>
+            <div class="reel"><div class="symbol" id="reel2">7️⃣</div></div>
+            <div class="reel"><div class="symbol" id="reel3">🔔</div></div>
+        </div>
+
+        <button id="spin-btn">START 🚀</button>
+    </div>
+
+    <script>
+        // --- SƏS SİSTEMİ (Web Audio API) ---
+        // MP3 fayllarına ehtiyac yoxdur, səslər kodla yaranır!
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let soundEnabled = true;
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'spin') {
+                // Fırlanma səsi (Elektrik vızıltısı)
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(100, now);
+                osc.frequency.exponentialRampToValueAtTime(600, now + 0.2);
+                gainNode.gain.setValueAtTime(0.1, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            } 
+            else if (type === 'win') {
+                // Qələbə səsi (Super Mario tərzi sikkə səsi)
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(500, now);
+                osc.frequency.setValueAtTime(1000, now + 0.1);
+                gainNode.gain.setValueAtTime(0.1, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            } 
+            else if (type === 'jackpot') {
+                // Böyük uduş (Melodiya)
+                playTone(400, 0, 0.2);
+                playTone(500, 0.2, 0.4);
+                playTone(600, 0.4, 0.6);
+                playTone(800, 0.6, 1.0);
+            }
+            else if (type === 'stop') {
+                // Dayanma səsi (Tıq)
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(150, now);
+                gainNode.gain.setValueAtTime(0.1, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            }
+        }
+
+        function playTone(freq, start, end) {
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.connect(g);
+            g.connect(audioCtx.destination);
+            o.type = 'sine';
+            o.frequency.value = freq;
+            g.gain.setValueAtTime(0.1, audioCtx.currentTime + start);
+            g.gain.linearRampToValueAtTime(0, audioCtx.currentTime + end);
+            o.start(audioCtx.currentTime + start);
+            o.stop(audioCtx.currentTime + end);
+        }
+
+        // --- OYUN MƏNTİQİ ---
+        const symbols = [
+            { char: '🍋', val: 2, weight: 40, color: '#ffff00' }, 
+            { char: '🍒', val: 3, weight: 30, color: '#ff0055' }, 
+            { char: '🔔', val: 5, weight: 15, color: '#ffcc00' }, 
+            { char: '7️⃣', val: 10, weight: 10, color: '#00ccff' }, 
+            { char: '💎', val: 50, weight: 5, color: '#ffffff' }   
+        ];
+
+        let balance = 5000;
+        let isSpinning = false;
+        const bet = 100;
+        let spinInterval;
+
+        const spinBtn = document.getElementById('spin-btn');
+        const balEl = document.getElementById('balance');
+        const msgEl = document.getElementById('message');
+        const machineBox = document.getElementById('machine-box');
+        const soundBtn = document.getElementById('sound-btn');
+        const reels = [
+            document.getElementById('reel1'),
+            document.getElementById('reel2'),
+            document.getElementById('reel3')
+        ];
+
+        // Səsi açıb-bağlamaq
+        soundBtn.addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            soundBtn.innerText = soundEnabled ? "🔊" : "🔇";
+            soundBtn.style.opacity = soundEnabled ? "1" : "0.5";
+        });
+
+        function getRandom() {
+            let total = symbols.reduce((acc, s) => acc + s.weight, 0);
+            let rand = Math.random() * total;
+            for (let s of symbols) {
+                if (rand < s.weight) return s;
+                rand -= s.weight;
+            }
+            return symbols[0];
+        }
+
+        spinBtn.addEventListener('click', () => {
+            if (isSpinning || balance < bet) return;
+            
+            // AudioContext ilk klikdə işə düşməlidir (Brauzer siyasəti)
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            balance -= bet;
+            balEl.innerText = balance;
+            startSpin();
+        });
+
+        function startSpin() {
+            isSpinning = true;
+            spinBtn.disabled = true;
+            msgEl.innerText = "Fırlanır...";
+            msgEl.style.color = "#fff";
+            machineBox.classList.remove('win-border');
+
+            reels.forEach(r => r.parentElement.classList.add('spinning'));
+
+            // Hər 0.1 saniyədən bir səs çıxar
+            let soundCounter = 0;
+            spinInterval = setInterval(() => {
+                reels.forEach(r => r.innerText = symbols[Math.floor(Math.random() * symbols.length)].char);
+                if(soundCounter % 2 === 0) playSound('spin'); // Hər dövrdə səs eləmə, baş ağrıdar
+                soundCounter++;
+            }, 80);
+
+            setTimeout(() => {
+                clearInterval(spinInterval);
+                stopSpin();
+            }, 2000); // 2 saniyə fırlanır
+        }
+
+        function stopSpin() {
+            reels.forEach(r => r.parentElement.classList.remove('spinning'));
+            playSound('stop'); // Dayanma səsi
+
+            let res1 = getRandom();
+            let res2 = getRandom();
+            let res3 = getRandom();
+
+            reels[0].innerText = res1.char;
+            reels[1].innerText = res2.char;
+            reels[2].innerText = res3.char;
+
+            checkWin(res1, res2, res3);
+            
+            isSpinning = false;
+            spinBtn.disabled = false;
+        }
+
+        function checkWin(r1, r2, r3) {
+            let winAmount = 0;
+
+            if (r1.char === r2.char && r2.char === r3.char) {
+                // JACKPOT
+                winAmount = bet * r1.val;
+                msgEl.innerHTML = `🔥 MÖHTƏŞƏM! <span style="color:${r1.color}">${winAmount}</span> QAZANDINIZ!`;
+                machineBox.classList.add('win-border');
+                playSound('jackpot'); // Cekpot musiqisi
+            }
+            else if (r1.char === r2.char || r2.char === r3.char || r1.char === r3.char) {
+                // Kiçik Uduş
+                winAmount = Math.floor(bet * 1.5);
+                msgEl.innerText = `Qazandınız: ${winAmount}`;
+                playSound('win'); // Sadə qazanma səsi
+            } 
+            else {
+                msgEl.innerText = "Bəxtini bir daha sına!";
+            }
+
+            balance += winAmount;
+            balEl.innerText = balance;
+
+            if (balance < bet) {
+                msgEl.innerText = "BALANS BİTDİ! Səhifəni yeniləyin.";
+                spinBtn.disabled = true;
+            }
+        }
+    </script>
+</body>
+</html>
